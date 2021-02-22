@@ -1,14 +1,31 @@
 <template>
     <div>
         <b-navbar toggleable="lg" type="dark" variant="info">
-            <b-navbar-brand href="#">NavBar</b-navbar-brand>
+            <b-navbar-brand href="#">Kamaleon 360.</b-navbar-brand>
 
             <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav>
-                    <b-nav-item href="#">Link</b-nav-item>
-                    <b-nav-item href="#" disabled>Disabled</b-nav-item>
+                    <template
+                            v-for="(menu,indexMenu) in menus"
+                    >
+                        <template v-if="menu.isSimple()">
+                            <b-nav-item :href="menu.link" @click.prevent="$router.push(menu.link).catch(()=>{})" :key="indexMenu">{{menu.nombre}}</b-nav-item>
+                        </template>
+                        <template v-else>
+                            <b-nav-item-dropdown :key="indexMenu" :text="menu.nombre" right>
+                                <b-dropdown-item
+                                        href="#"
+                                        :key="indexSubMenu"
+                                        v-for="(menu,indexSubMenu) in menu.hijos"
+                                        @click.prevent="clickMenu(menu.link)"
+                                >
+                                    {{ menu.nombre }}
+                                </b-dropdown-item>
+                            </b-nav-item-dropdown>
+                        </template>
+                    </template>
                 </b-navbar-nav>
 
                 <!-- Right aligned nav items -->
@@ -41,7 +58,12 @@
 
 <script>
     export default {
-        name: "NavBar"
+        name: "NavBar",
+        computed:{
+            menus(){
+                return this.$store.getters.main_menus
+            }
+        }
     }
 </script>
 

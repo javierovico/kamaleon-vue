@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<krpano version="1.19-pr16" logkey="false" showerrors="false" title="Panorama">
+    <include url="%$ROOT_URL%/krpano/skin/vtourskin.xml" />
+    <!-- Circle Hotspots Plugin -->
+    <include url="%$ROOT_URL%/krpano/plugins/circle_hotspots.xml"/>
+    <include url="%$ROOT_URL%/krpano/plugins/showtext.xml" />
+    <textstyle name="DEFAULT"
+               origin="cursor"
+               edge="bottom"
+               xoffset="0"
+               yoffset="-3"
+               fadeintime="0.0"
+               showtime="0.1"
+               fadetime="0.0"
+               font="Times"
+               fontsize="12.0"
+               bold="true"
+               italic="false"
+               textcolor="0x000000"
+               textalign="none"
+               padding="1"
+               css=""
+               width=""
+               height=""
+               vcenter=""
+               background="true"
+               backgroundcolor="0xFFFFFF"
+               backgroundalpha="1.0"
+               border="true"
+               bordercolor="0x000000"
+               borderalpha="1.0"
+               borderwidth="1.0"
+               roundedge="0"
+               shadow="0.0"
+               shadowrange="4.0"
+               shadowangle="45"
+               shadowcolor="0x000000"
+               shadowalpha="1.0"
+               textshadow="0.0"
+               textshadowrange="4.0"
+               textshadowangle="45"
+               textshadowcolor="0x000000"
+               textshadowalpha="1.0"
+               alpha="1.0"
+               parent=""
+               noclip="true"
+    />
+    <!--    TODO: hacer que se llame luego de cargar dinamicamente nomas-->
+<!--    <action name="startup_aldo">-->
+<!--        if(startscene === null, copy(startscene,scene[0].name));-->
+<!--        loadscene(get(startscene), null, MERGE);-->
+<!--		skin_startup();-->
+<!--    </action>-->
+
+<!--    TODO: Carga el js que carga dinamicamente todo-->
+    <layer name="cargador"
+            url="cargador.js"
+			keep="true"
+		   	onloaded="notificar_cargado();"
+    />
+
+	<events onloaderror="plugin[cargador].manejar_error(get(lasterror));"/>
+
+	<events  onsingleclick="screentosphere(mouse.x, mouse.y, m_ath, m_atv);plugin[cargador].send_click(get(m_ath),get(m_atv));" />
+	<events  onviewchanged="plugin[cargador].view_change();" />
+
+    <!-- TODO:  Crea el evento de escucha para escuchar cambios de panoramas  -->
+    <events enabled="false" name="notificarpano" onnewpano="js( establecerPanoActual(get(xml.scene), 'j'));" keep="true"/>
+    <!-- TODO: no se porque, pero parece que se solapa con el de arriba -->
+<!--    <events-->
+<!--            name="notificarpano"-->
+<!--            keep="true"-->
+<!--            enabled="false"-->
+<!--    />-->
+    <!-- Hace que se llame al map listener cada vez que se cambia -->
+    <events name="notificarpano_mapa" onnewpano="plugin[skin_map].dosomething(get(xml.scene));" keep="true"/>
+    <!--   Prepara el pluggin de sonido -->
+    <plugin name="soundinterface"
+            url.html5="%$URLKRPANO%/plugins/soundinterface.js"
+            rootpath=""
+            preload="true"
+            keep="true"
+    />
+
+    <!-- puse aca para llenar el id -->
+	<action name="skin_startup" scope="local">
+		<!-- apply skin settings on startup -->
+		if(skin_settings.thumbs,
+			if(skin_settings.thumbs_opened,
+				set(layer[skin_thumbs].state, 'opened');
+				set(layer[skin_thumbs_container].visible, true);
+			);
+			copy(layer[skin_thumbs].draggable, skin_settings.thumbs_dragging);
+			if(skin_settings.thumbs_onhoverscrolling AND device.mouse,
+				set(layer[skin_thumbs].draggable, false);
+				set(layer[skin_thumbs].onhover_autoscrolling, true);
+			);
+		);
+
+		if(skin_settings.gyro AND !device.desktop AND device.html5,
+			copy(plugin[skin_gyro].url, plugin[skin_gyro].html5_url);
+		);
+
+		if(skin_settings.webvr AND device.html5 AND device.webgl,
+			copy(plugin[webvr].url, plugin[webvr].pluginurl);
+		);
+
+		if(skin_settings.maps == true,
+			set(layer[skin_btn_map].visible, true);
+
+			if(device.flash,
+				copy(layer[skin_map].key, skin_settings.maps_bing_api_key);
+				set(layer[skin_map].url, '%$URLKRPANO%/skin/bingmaps.swf');
+			  ,
+				if(skin_settings.maps_type == 'bing',
+					copy(layer[skin_map].key, skin_settings.maps_bing_api_key);
+					set(layer[skin_map].url, '%$URLKRPANO%/skin/bingmaps.js');
+				  ,
+				 	copy(layer[skin_map].key, skin_settings.maps_google_api_key);
+					set(layer[skin_map].url, '%$URLKRPANO%/skin/mi_plugin_map.js');
+					set(layer[skin_map].idpadre, get(idunico));
+				);
+			);
+		);
+
+		if(skin_settings.littleplanetintro AND !global.startactions AND (device.webgl OR device.flash),
+			skin_setup_littleplanetintro();
+		);
+
+		skin_addthumbs();
+		skin_onresize();
+		skin_updatescroll();
+
+		set(layer[skin_layer].visible, true);
+        if(editar == null, set(editar,false));
+        set(layer[picture].visible,get(editar));
+
+        if(llamada,
+            txtadd(llamar_a, 'js(' , get(llamada) , '(get(xml.scene)));');
+            set( events[notificarpano].onnewpano ,  get(llamar_a) );
+		,
+			set( events[notificarpano].onnewpano , '');
+        );
+
+        if(autorot, set(autorotate.enabled,true),primera_interaccion());
+        //skin_showthumbs();
+	</action>
+
+    <!--    Desactiva el movimiento automatico cuando se pulsa algo-->
+    <events
+        name="evento_interaccion"
+        keep="true"
+        enabled="true"
+        onkeydown="primera_interaccion()"
+        onmousedown="primera_interaccion()"
+        onnewpano="delayedcall(introimage, 10.0, if(scene.count GT 1 ,skin_nextscene_loop(+1)) );"
+    />
+    <!--    Desactiva el movimiento -->
+    <action name="primera_interaccion">
+        set(autorotate.enabled,false);
+        set(events[evento_interaccion].onkeydown,false);
+        set(events[evento_interaccion].onmousedown,false);
+        set(events[evento_interaccion].onnewpano,false);
+        stopdelayedcall(introimage);
+    </action>
+
+    <!-- customize skin settings: maps, gyro, webvr, thumbnails, tooltips, layout, design, ... -->
+    <skin_settings maps="true"
+                   maps_type="google"
+                   maps_bing_api_key=""
+                   maps_google_api_key=""
+                   maps_zoombuttons="false"
+                   gyro="true"
+                   webvr="true"
+                   webvr_gyro_keeplookingdirection="false"
+                   webvr_prev_next_hotspots="true"
+                   littleplanetintro="false"
+                   title="true"
+                   thumbs="true"
+                   thumbs_width="300" thumbs_height="150" thumbs_padding="40" thumbs_crop="0|40|300|160"
+                   thumbs_opened="false"
+                   thumbs_text="true"
+                   thumbs_dragging="true"
+                   thumbs_onhoverscrolling="false"
+                   thumbs_scrollbuttons="false"
+                   thumbs_scrollindicator="false"
+                   thumbs_loop="false"
+                   tooltips_buttons="false"
+                   tooltips_thumbs="false"
+                   tooltips_hotspots="false"
+                   tooltips_mapspots="false"
+                   deeplinking="false"
+                   loadscene_flags="MERGE"
+                   loadscene_blend="OPENBLEND(0.5, 0.0, 0.75, 0.05, linear)"
+                   loadscene_blend_prev="SLIDEBLEND(0.5, 180, 0.75, linear)"
+                   loadscene_blend_next="SLIDEBLEND(0.5,   0, 0.75, linear)"
+                   loadingtext="Cargando..."
+                   layout_width="100%"
+                   layout_maxwidth="814"
+                   controlbar_width="-24"
+                   controlbar_height="40"
+                   controlbar_offset="20"
+                   controlbar_offset_closed="-40"
+                   controlbar_overlap.no-fractionalscaling="10"
+                   controlbar_overlap.fractionalscaling="0"
+                   design_skin_images="vtourskin.png"
+                   design_bgcolor="0x2D3E50"
+                   design_bgalpha="0.8"
+                   design_bgborder="0"
+                   design_bgroundedge="1"
+                   design_bgshadow="0 4 10 0x000000 0.3"
+                   design_thumbborder_bgborder="3 0xFFFFFF 1.0"
+                   design_thumbborder_padding="2"
+                   design_thumbborder_bgroundedge="0"
+                   design_text_css="color:#FFFFFF; font-family:Arial;"
+                   design_text_shadow="1"
+    />
+
+    <include url="%$ROOT_URL%/krpano/skin/vtourskin_design_flat.xml"  />
+
+    <!--    TODO: falta la portada jare-->
+
+    <!--    TODO: falta el sonido jare -->
+
+    <!--    TODO: zona de panoramas -->
+
+
+<!--    <scene-->
+<!--            name="pano264"-->
+<!--            mostrarMiniaturaInferior="false"-->
+<!--            lat="-25.385805"-->
+<!--            lng="-57.14063"-->
+<!--            thumburl="https://s3.us-east-2.amazonaws.com/kamaleon360.panos/tupasy_cambios2_0/iglesia_portada/thumbnail.jpg"-->
+<!--            backgroundsound=""-->
+<!--            backgroundsoundloops="0"-->
+<!--            haspolygons="false"-->
+<!--            titleid="pano264"-->
+<!--            title="Predio central"-->
+<!--            descriptionid=""-->
+<!--            multires="true"-->
+<!--            planar="false"-->
+<!--            full360="true"-->
+<!--            video="false"-->
+<!--            sonido="https://s3.us-east-2.amazonaws.com/kamaleon360.panos/archivos/audios/caacupe/tercera05.mp3"-->
+<!--            seen="false">-->
+<!--    </scene>-->
+
+    <!--    TODO: el que muestra el cursor para editar -->
+    <layer name="picture"
+           keep="true"
+           url="%$URLKRPANO%/skin/sin_titulo-1.png"
+           align="center"
+           x="0"
+           y="0"
+           zorder="3"
+           handcursor="false"
+           enabled="false"
+           visible="false"/>
+
+</krpano>
