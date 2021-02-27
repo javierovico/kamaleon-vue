@@ -1,52 +1,31 @@
-import ClaseModel from "@/store/modelos/ClaseModel";
+import ClaseModelV2 from "@/store/modelos/ClaseModelV2";
+import Location from "@/store/modelos/Location";
+import Archivo from "@/store/modelos/Archivo";
+import {TIPO_TERRESTRE} from "@/store/modelos/Pano";
 
-export default class PanoConfig extends ClaseModel{
-    created_at
-    id
-    nivel_zoom
-    path
-    tipo
-    updated_at
-    //calculados asha
-    urlRoot
-    thumbnailUrl
-    previewUrl
+export default class PanoConfig extends ClaseModelV2{
 
-    constructor(
-        created_at = null,
-        id = null,
-        nivel_zoom = null,
-        path = null,
-        tipo = null,
-        updated_at = null,
-        urlRoot = null,
-        thumbnailUrl = null,
-        previewUrl = null
-    ) {
-        super();
-        this.created_at = created_at
-        this.id = id
-        this.nivel_zoom = nivel_zoom
-        this.path = path
-        this.tipo = tipo
-        this.updated_at = updated_at
-        this.urlRoot = urlRoot
-        this.thumbnailUrl = thumbnailUrl
-        this.previewUrl = previewUrl
+    static OBJETOS = [
+        {key:'created_at', type:String, porDefecto:null},
+        {key:'id', type:Number, porDefecto:null},
+        {key:'nivel_zoom', type:Number, porDefecto:0},
+        {key:'path', type:String, porDefecto:''},
+        {key:'previewUrl', type:String, porDefecto:null},
+        {key:'tipo', type:Number, porDefecto:1},
+        {key:'updated_at', type:String, porDefecto:null},
+        {key:'urlRoot', type:String, porDefecto:null},
+        {key:'circleUrl', type:String, porDefecto:null},
+    ]
+
+    static PRIMARY_KEY = 'id'
+
+    static URL_DESCARGA = `/xxx`
+
+    constructor(e) {
+        super(e,PanoConfig.OBJETOS,PanoConfig.PRIMARY_KEY);
     }
 
-
     static fromSource(e){
-        return new PanoConfig(
-            e.created_at,
-            e.id,
-            e.nivel_zoom,
-            e.path,
-            e.tipo,
-            e.updated_at,
-            e.urlRoot,
-            e.thumbnailUrl,
-            e.previewUrl,
-        )
+        return new PanoConfig(e)
     }
 }

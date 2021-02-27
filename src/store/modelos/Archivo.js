@@ -1,39 +1,22 @@
-import ClaseModel from "@/store/modelos/ClaseModel";
+import ClaseModelV2 from "@/store/modelos/ClaseModelV2";
+export default class Archivo extends ClaseModelV2{
 
-export default class Archivo extends ClaseModel{
-    created_at
-    id
-    path
-    thumb
-    thumb_url
-    tipo
-    updated_at
-    url
-    //de vista
-    _reproduciendo = false
+    static TIPO_SONIDO = 6;
+    static TIPO_ABSOLUTO = 1;
+
+    static OBJETOS = [
+        {key:'id', type:Number, porDefecto:null},
+        {key:'created_at', type:String, porDefecto:null},
+        {key:'updated_at', type:String, porDefecto:null},
+        {key:'path', type:String, porDefecto: ''},
+        {key:'tipo', type:Number, porDefecto:Archivo.TIPO_ABSOLUTO},
+        {key:'url', type:String, porDefecto: ''},
+    ]
 
     static URL_DESCARGA = `archivo`
-    static TIPO_SONIDO = 6;
 
-    constructor(
-        created_at = null,
-        id = null,
-        path = null,
-        thumb = null,
-        thumb_url = null,
-        tipo = null,
-        updated_at = null,
-        url = null,
-    ) {
-        super();
-        this.created_at = created_at
-        this.id = id
-        this.path = path
-        this.thumb = thumb
-        this.thumb_url = thumb_url
-        this.tipo = tipo
-        this.updated_at = updated_at
-        this.url = url
+    constructor(e) {
+        super(e,Archivo.OBJETOS);
     }
 
     tipoStr(){
@@ -48,23 +31,19 @@ export default class Archivo extends ClaseModel{
     }
 
     exists(){
-        return this.id > 0
+        return !!this.id
     }
 
-    getUrlCarga(){
-        return (this.exists())?(`archivo/${this.id}`):(`archivo`)
+    static urlCargaFromId(id){
+        let url = Archivo.URL_DESCARGA
+        if(id){
+            url += `/${id}`
+        }
+        return url
     }
+
 
     static fromSource(e){
-        return new Archivo(
-            e.created_at,
-            e.id,
-            e.path,
-            e.thumb,
-            e.thumb_url,
-            e.tipo,
-            e.updated_at,
-            e.url,
-        )
+        return new Archivo(e)
     }
 }

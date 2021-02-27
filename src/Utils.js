@@ -185,7 +185,7 @@ export function cambiarQuery(params){
                     }
                     const queryInsert = prefijo + key
                     if(nuevo !== null){
-                        this.$router.replace(addQuery(this.$route,{add:{[queryInsert]:nuevo}})).catch(()=>{})
+                        this.$router.replace(addQuery(this.$route,{add:{[queryInsert]:nuevo}})).catch((e)=>{})
                     }else{
                         this.$router.replace(addQuery(this.$route,{rem:[queryInsert]})).catch(()=>{})
                     }

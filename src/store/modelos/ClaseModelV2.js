@@ -1,8 +1,34 @@
-export default class ClaseModel{
+export default class ClaseModelV2{
 
     //para actualizacion masiva
     _update = false
     _add = false
+
+    objetos
+    primaryKey
+
+
+    constructor(params,objetos = [],primaryKey = 'id') {
+        this.objetos = objetos
+        this.primaryKey = primaryKey
+        this.objetos.forEach(({key,type,porDefecto})=>{
+            if(params[key]){
+                switch(type){
+                    case String:
+                        this[key] = params[key]
+                        break;
+                    case Number:
+                        this[key] = parseInt(params[key])
+                        break;
+                    default:
+                        this[key] = new type(params[key])
+                }
+            }else{
+                this[key] = porDefecto
+            }
+        })
+    }
+
 
     /**
      * Establece si se va actualizar o no, si no se actualiza, obvio no se agrega
@@ -51,7 +77,7 @@ export default class ClaseModel{
 
     /**
      * Por si se quiera alterar los datos a enviar
-     * @returns {ClaseModel}
+     * @returns {ClaseModelV2}
      */
     dataEnvio(){
         return this
@@ -68,10 +94,6 @@ export default class ClaseModel{
 
     getUrlCarga(){
         throw 'Se debe implementar en el hijo'
-    }
-
-    static fromSource(e){
-        throw 'no'
     }
 
     getMethodCarga(){

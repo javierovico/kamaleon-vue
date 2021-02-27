@@ -170,7 +170,7 @@ const actions = {
                     method: 'GET'
                 })
                     .then(response => {
-                        const panos = response.data.data.map(p=>Pano.fromSource(p))
+                        const panos = response.data.data.map(p=>new Pano(p))
                         if(!soloRetornar){
                             commit('pano_cargado', {panos,idInstancia})
                         }

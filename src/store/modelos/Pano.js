@@ -1,76 +1,33 @@
-import ClaseModel from "@/store/modelos/ClaseModel";
-import Archivo from "@/store/modelos/Archivo";
 import PanoConfig from "@/store/modelos/PanoConfig";
 import Location from "@/store/modelos/Location";
+import ClaseModelV2 from "@/store/modelos/ClaseModelV2";
+import Archivo from "@/store/modelos/Archivo";
 
 export const TIPO_TERRESTRE = 1
 
-export default class Pano extends ClaseModel{
-    id
-    nombre
-    archivo
-    contenido
-    zoom
-    gps_lat
-    gps_lng
-    activo
-    created_at
-    updated_at
-    fondo_id
-    tipo
-    //pivots
-    pivot
-    //calculadas como atributo
-    urlMiniatura
-    //relaciones
-    fondo
-    configuracion
-    location
-    thumbnail
-    //visual
-    _reproduciendo = false
+export default class Pano extends ClaseModelV2{
+
+    static OBJETOS = [
+        {key:'id', type:Number, porDefecto:null},
+        {key:'nombre', type:String, porDefecto:''},
+        {key:'activo', type:Number, porDefecto:1},
+        {key:'created_at', type:String, porDefecto:null},
+        {key:'updated_at', type:String, porDefecto:null},
+        {key:'fondo_id', type:Number, porDefecto:null},
+        {key:'miniatura_id', type:Number, porDefecto:null},
+        {key:'tipo', type:Number, porDefecto:TIPO_TERRESTRE},
+        {key:'pivot', type:Object, porDefecto: {}},
+        {key:'configuracion', type:PanoConfig, porDefecto:null},
+        {key:'location', type:Location, porDefecto:null},
+        {key:'thumbnail', type:Archivo, porDefecto:null},
+    ]
+
+    static PRIMARY_KEY = 'id'
 
     static URL_DESCARGA = `/pano`
 
-    constructor(
-        id = null,
-        nombre = '',
-        archivo = null,
-        contenido = null,
-        zoom = null,
-        gps_lat = '',
-        gps_lng = '',
-        activo = 1,
-        created_at = null,
-        updated_at = null,
-        fondo_id = null,
-        tipo = TIPO_TERRESTRE,
-        fondo = null,
-        urlMiniatura = '',
-        pivot = null,
-        configuracion = null,
-        location = null,
-        thumbnail = null
-    ) {
-        super();
-        this.id=id
-        this.nombre=nombre
-        this.archivo=archivo
-        this.contenido=contenido
-        this.zoom=zoom
-        this.gps_lat=gps_lat
-        this.gps_lng=gps_lng
-        this.activo=activo
-        this.created_at=created_at
-        this.updated_at=updated_at
-        this.fondo_id=fondo_id
-        this.tipo=tipo
-        this.fondo = fondo?Archivo.fromSource(fondo):null
-        this.urlMiniatura = urlMiniatura
-        this.pivot = pivot
-        this.configuracion = configuracion
-        this.location = location
-        this.thumbnail = thumbnail
+    constructor(e) {
+        super(e,Pano.OBJETOS,Pano.PRIMARY_KEY);
     }
 
     exists(){
@@ -78,33 +35,20 @@ export default class Pano extends ClaseModel{
     }
 
     static urlCargaFromId(id){
-        return (id)?(`/pano/${id}`):(`/pano`)
+        let url = Pano.URL_DESCARGA
+        if(id){
+            url += `/${id}`
+        }
+        return url
+    }
+
+    /** Legacy */
+    fromSource(e){
+        return new Pano(e)
     }
 
     getUrlCarga(){
-        return Pano.urlCargaFromId(this[ClaseModel.PRIMARY_KEY])
+        return Pano.urlCargaFromId(this[this.primaryKey])
     }
 
-    static fromSource(e){
-        return new Pano(
-            e.id,
-            e.nombre,
-            e.archivo,
-            e.contenido,
-            e.zoom,
-            e.gps_lat,
-            e.gps_lng,
-            e.activo,
-            e.created_at,
-            e.updated_at,
-            e.fondo_id,
-            e.tipo,
-            e.fondo,
-            e.urlMiniatura,
-            e.pivot,
-            e.configuracion?PanoConfig.fromSource(e.configuracion):null,
-            e.location?Location.fromSource(e.location):null,
-            e.thumbnail?Archivo.fromSource(e.thumbnail):null,
-        )
-    }
 }

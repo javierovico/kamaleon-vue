@@ -118,52 +118,62 @@ function krpanoplugin() {
             const thumbnail = p.thumbnail.url
             //Inicio de contenido
             let contenido = ''
-            contenido += `<autorotate horizon="0.000000" tofov="90.000000" waittime="1" speed="5"/>
-                <panoview h="0.000000" v="0.000000" fov="90.000000" hmin="-180" hmax="180" vmin="-90" vmax="90" fovmax="90" />
-                <view fisheye="0"
-                      limitview="range"
-                      hlookatmin="-180"
-                      hlookatmax="180"
-                      vlookatmin="-90"
-                      vlookatmax="90"
-                      maxpixelzoom="1.0"
-                      fovtype="VFOV"
-                      fovmax="90"
-                      fov="90.000000"
-                      hlookat="0.000000"
-                      vlookat="0.000000"/>
-                <preview url="${p.configuracion.previewUrl}" type="CUBESTRIP" striporder="FRBLUD" />`
+            contenido += `
+<autorotate horizon="0.000000" tofov="90.000000" waittime="1" speed="5"/>
+    <panoview h="0.000000" v="0.000000" fov="90.000000" hmin="-180" hmax="180" vmin="-90" vmax="90" fovmax="90" />
+    <view fisheye="0"
+          limitview="range"
+          hlookatmin="-180"
+          hlookatmax="180"
+          vlookatmin="-90"
+          vlookatmax="90"
+          maxpixelzoom="1.0"
+          fovtype="VFOV"
+          fovmax="90"
+          fov="90.000000"
+          hlookat="0.000000"
+          vlookat="0.000000"/>
+    <preview url="${p.configuracion.previewUrl}" type="CUBESTRIP" striporder="FRBLUD" />`
             if(p.configuracion.nivel_zoom >= 0){
-                contenido += `<image type="CUBE" multires="true" baseindex="0" tilesize="512" devices="!androidstock|webgl">`
+                contenido +=`
+    <image type="CUBE" multires="true" baseindex="0" tilesize="512" devices="!androidstock|webgl">`
                 for(let level = p.configuracion.nivel_zoom; level >= 0 ; level-- ){
                     //Se crean los levels
-                    contenido += `<level tiledimagewidth="${cortes[level]*512}" tiledimageheight="${cortes[level]*512}">`
+                    contenido +=`
+        <level tiledimagewidth="${cortes[level]*512}" tiledimageheight="${cortes[level]*512}">`
                     levels.forEach((l,i)=>{
-                        contenido += `<${l} url="${p.configuracion.urlRoot}/${i}/${level}/%v_%u.jpg"/>`
+                        contenido += `
+            <${l} url="${p.configuracion.urlRoot}/${i}/${level}/%v_%u.jpg"/>`
                     })
-                    contenido += `</level>`
+                    contenido += `
+        </level>`
                 }
-                contenido += `</image>`
+                contenido += `
+    </image>`
             }
-            contenido += `<image type="CUBE" devices="androidstock.and.no-webgl">`
+            contenido += `
+    <image type="CUBE" devices="androidstock.and.no-webgl">`
             levels.forEach((l,i)=>{
-                contenido += `<${l} url="${p.configuracion.urlRoot}/mobile/${i}.jpg"/>`
+                contenido +=
+`        <${l} url="${p.configuracion.urlRoot}/mobile/${i}.jpg"/>`
             })
-            contenido += `</image>`
+            contenido += `
+    </image>`
             tourSpots.filter(ts=> ts.pano_fuente_id === p.id).forEach(spot=>{
                 const destinoPano = panoramas.find(p=> p.id === spot.pano_destino_id)
                 if(!destinoPano){
                     console.warn(`El pano ${p.nombre} tiene un destino id=${spot.pano_destino_id} no encontrado`)
                     return
                 }
-                contenido += `<hotspot name="pano${destinoPano.id}"
-                                 url="${destinoPano.urlMiniatura}"
-                                 thumb="${raizArchivos}/${destinoPano.archivo}/thumbnail_hotspot.png"
-                                 ath="${spot.en_h}" atv="${spot.en_v}"
-                                 fth="${spot.a_h }" ftv="${spot.a_v}"
-                                 tag="Ir a ${destinoPano.nombre}"
-                                 style="hs_circle"
-                        />`
+                contenido += `
+    <hotspot name="pano${destinoPano.id}"
+             url="${spot.image.url}"
+             thumb="${destinoPano.configuracion.circleUrl}"
+             ath="${spot.en_h}" atv="${spot.en_v}"
+             fth="${spot.a_h }" ftv="${spot.a_v}"
+             tag="Ir a ${destinoPano.nombre}"
+             style="hs_circle"
+    />`
             })
             //fin de contenido
             console.log(contenido)
