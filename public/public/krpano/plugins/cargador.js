@@ -60,7 +60,10 @@ function krpanoplugin() {
         const sceneChange = krpano.get('sceneChange')
         if(sceneChange){
             sceneChange(panoId)
+        }else{
+            krpano.call(`skin_loadscene_original(get(newscenenameorindex), get(blendmode));`)
         }
+        krpano.call(`skin_showmap(false);skin_showthumbs(false);`)
     }
 
     function view_change(){

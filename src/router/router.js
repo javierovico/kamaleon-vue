@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Prueba from "@/components/Prueba";
 import PuntosView from "@/components/punto/PuntosView";
 import PuntoView from "@/components/punto/PuntoView";
+import MapaView from '@/components/mapa/MapaView'
 Vue.use(VueRouter);
 
 const routes = [
@@ -23,6 +24,11 @@ const routes = [
             propSlug: route.params.hotel_slug
         })
     },
+    {
+        path: '/prueba-mapa',
+        name: "PruebaMapa",
+        component: MapaView,
+    }
 ]
 
 export default new VueRouter({

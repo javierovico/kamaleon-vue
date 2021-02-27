@@ -144,7 +144,7 @@ function krpanoplugin()
                 latlngbounds.extend({lat: lat, lng: lng});
                 (function (ere) {
                     locations[id_pano].addListener('click',function () {
-                        krpano.call("loadscene(pano"+ere+");");
+                        krpano.call(`plugin[cargador].scene_change(pano${ere});`)
                     });
                 })(id_pano);
             }

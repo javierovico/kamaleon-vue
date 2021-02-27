@@ -15,10 +15,8 @@ export default class ClaseModelV2{
             if(params[key]){
                 switch(type){
                     case String:
-                        this[key] = params[key]
-                        break;
                     case Number:
-                        this[key] = parseInt(params[key])
+                        this[key] = params[key]
                         break;
                     default:
                         this[key] = new type(params[key])

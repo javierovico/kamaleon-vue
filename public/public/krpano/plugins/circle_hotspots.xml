@@ -46,7 +46,11 @@
         onclick2="
                     set(s_fth,get(hotspot[get(name)].fth));
                     set(s_ftv,get(hotspot[get(name)].ftv));
-                    loadscene(get(name),null,MERGE,get(skin_settings.loadscene_blend));
+                    if(sceneChange,
+                        plugin[cargador].scene_change(get(name));
+                    ,
+                        skin_loadscene_original(get(newscenenameorindex), get(blendmode));
+                    );
                     set(gtv, calc(-s_ftv) );
                     if(s_fth LT 0, set(gth, calc(s_fth + 180) ), set(gth, calc(s_fth - 180) ));
                     trace('gth: ',gth);
