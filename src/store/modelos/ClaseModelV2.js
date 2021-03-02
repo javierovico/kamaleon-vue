@@ -1,3 +1,5 @@
+import Tour from "@/store/modelos/Tour";
+
 export default class ClaseModelV2{
 
     //para actualizacion masiva
@@ -6,20 +8,23 @@ export default class ClaseModelV2{
 
     objetos
     primaryKey
+    urlDescarga
 
 
-    constructor(params,objetos = [],primaryKey = 'id') {
+    constructor(params,objetos = [],primaryKey = 'id',urlDescarga = 'xxx') {
         this.objetos = objetos
         this.primaryKey = primaryKey
+        this.urlDescarga = urlDescarga
         this.objetos.forEach(({key,type,porDefecto})=>{
-            if(params[key]){
+            if(typeof params[key] !== 'undefined'){
                 switch(type){
                     case String:
                     case Number:
+                    case null:
                         this[key] = params[key]
                         break;
                     default:
-                        this[key] = new type(params[key])
+                        this[key] = (params[key])?new type(params[key]):null
                 }
             }else{
                 this[key] = porDefecto
@@ -50,8 +55,6 @@ export default class ClaseModelV2{
         }
     }
 
-    static URL_DESCARGA = `/xxxx`
-
     /**
      * Retorna true si el modelo fue cambiado (a un nivel basico, no se busca en arrays)
      * @param sucursalCopia
@@ -81,34 +84,24 @@ export default class ClaseModelV2{
         return this
     }
 
-    construirArrays() {
-
-    }
-
-
     exists(){
-        throw 'Se debe implementar en el hijo'
-    }
-
-    getUrlCarga(){
-        throw 'Se debe implementar en el hijo'
+        return !!(this[this.primaryKey])
     }
 
     getMethodCarga(){
         return this.exists()?'PUT':'POST'
     }
 
-    static urlCargaFromId(id){
-        throw 'nos'
-        // let url = '/categoria'
-        // if(id){
-        //     url += `/${id}`
-        // }
-        // return url
+    getUrlCarga(){
+        return ClaseModelV2.urlCargaFromUrlPrimaryKey(this.urlDescarga,this.primaryKey)
     }
 
 
-    getPrimaryKey(){
-        throw 'no impoement  3232'
+    static urlCargaFromUrlPrimaryKey(url,primaryKey){
+        if(primaryKey){
+            url += `/${primaryKey}`
+        }
+        return url
     }
+
 }

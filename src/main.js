@@ -14,6 +14,15 @@ import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 Vue.use(VueSweetalert2);
 
+//https://www.npmjs.com/package/vue2-google-maps
+import * as VueGoogleMaps from 'vue2-google-maps'
+Vue.use(VueGoogleMaps, {
+    load: {
+        key: 'AIzaSyAViVaAwNI4Uss03dVlks2gMZXcYQm3Xlg',
+        // libraries: 'places', // This is required if you use the Autocomplete plugin
+    },
+})
+
 /** Axios **/
 import axios from 'axios';
 axios.defaults.baseURL = process.env.VUE_APP_URL_API;

@@ -13,6 +13,7 @@ function instanciaFromSlug(slug) {
 
 const TIPO_PARAMS = 1
 const TIPO_SLUG = 2
+const TIPO_LOCATION_ONLY = 3
 
 const state = {
     instancias: []
@@ -30,6 +31,7 @@ const getters = {
     punto_recargar: (state,getters) => idInstancia => getters.punto_instancia(idInstancia)?.status === 'recargar',
     punto_instanciado: (state,getters) => idInstancia => !!getters.punto_instancia(idInstancia),
     punto_get_instancia_from_params: () => params => instanciaFromParams(params),
+    punto_get_instancia_from_location_only: () => instanciaFromLocationOnly(),
     /** Busca si existe un punto ya cargado a partir de su slug */
     punto_get_punto_by_slug: (state,getters) => slug => {
         let punto = null
@@ -39,6 +41,10 @@ const getters = {
     }
 }
 
+
+function instanciaFromLocationOnly() {
+    return `from_loca_only`;
+}
 
 const actions = {
     punto_cargar_from_slug({dispatch,getters},{slug}){
@@ -52,6 +58,18 @@ const actions = {
             }
             return dispatch('punto_cargar',{params,url,idInstancia,tipoInstancia})
         }
+    },
+    punto_cargar_all_with_location({dispatch}){
+        const params = {
+            with:['image','location'],
+            whereHas: ['location'],
+            columns: ['id','nombre','slug','image_id','location_id'],
+            descargar:true,
+        }
+        const idInstancia = instanciaFromLocationOnly()
+        const url = Punto.URL_DESCARGA
+        const tipoInstancia = TIPO_LOCATION_ONLY
+        return dispatch('punto_cargar',{params,url,idInstancia,tipoInstancia})
     },
     punto_cargar_from_params({ commit, dispatch }, {params}) {
         const idInstancia = instanciaFromParams(params)

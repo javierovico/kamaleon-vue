@@ -65,7 +65,7 @@ export default {
         ...llenarQuery(variablesQuery),
         params(){
             return {
-                with:['image'],
+                with:['image','location'],
                 page:this.propPage,
                 perPage: this.propPerPage
             }

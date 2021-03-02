@@ -15,11 +15,15 @@ export default class Location extends ClaseModelV2 {
 
     constructor(e) {
         super(e,Location.OBJETOS);
-        console.log(this)
     }
 
 
     static fromSource(e){
         return new Location(e)
+    }
+
+    getLatLngObject(){
+        const {lat,lng} = this
+        return {lat, lng}
     }
 }
