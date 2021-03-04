@@ -23,6 +23,13 @@ Vue.use(VueGoogleMaps, {
     },
 })
 
+// GOogle map
+// const VueGoogleMap = require('vue-google-maps')
+// VueGoogleMap.load({
+//     'key': 'AIzaSyAViVaAwNI4Uss03dVlks2gMZXcYQm3Xlg',
+// })
+// Vue.component('google-map', VueGoogleMap.Map);
+
 /** Axios **/
 import axios from 'axios';
 axios.defaults.baseURL = process.env.VUE_APP_URL_API;
