@@ -1,12 +1,20 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Prueba from "@/components/Prueba";
+import Inicio from "@/components/Inicio";
 import PuntosView from "@/components/punto/PuntosView";
 import PuntoView from "@/components/punto/PuntoView";
 import MapaView from '@/components/mapa/MapaView'
 Vue.use(VueRouter);
 
 const routes = [
+    {
+        path: "/",
+        name: "Inicio",
+        component: Inicio,
+        props:{
+            propPrefijoQuery: 'inicio',
+        }
+    },
     {
         path: "/lugares",
         name: "Lugares",

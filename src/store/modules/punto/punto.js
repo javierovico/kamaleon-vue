@@ -63,7 +63,7 @@ const actions = {
         const params = {
             with:['image','location'],
             whereHas: ['location'],
-            columns: ['id','nombre','slug','image_id','location_id'],
+            // columns: ['id','nombre','slug','image_id','location_id'],
             descargar:true,
         }
         const idInstancia = instanciaFromLocationOnly()
