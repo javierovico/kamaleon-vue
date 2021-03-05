@@ -72,4 +72,12 @@ export default class Punto extends ClaseModelV2{
     getLatLngObject(){
         return this.location?this.location.getLatLngObject():null
     }
+
+    getMiniaturaUrl(){
+        let urlImage = this?.image?.url
+        if(!urlImage){
+            urlImage =  `http://i.stack.imgur.com/g672i.png`
+        }
+        return urlImage
+    }
 }

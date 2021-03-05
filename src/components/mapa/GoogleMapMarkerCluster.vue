@@ -1,7 +1,22 @@
+<template>
+  <div ref="popup" v-show="punto">
+    <div>
+      <a href="#" @click.prevent="infoWindowClick(punto)">
+        <h5>{{ punto?punto.nombre:'' }}</h5>
+      </a>
+    </div>
+    <div>
+      <img :src='punto?punto.getMiniaturaUrl():""' alt="img" style="width: 150px;height: 100%">
+    </div>
+  </div>
+</template>
+
 <script>
 import { POINT_MARKER_ICON_CONFIG } from "@/constants/mapSettings";
 import { stylesCluster } from "@/constants/mapSettings";
 import MarkerClusterer from '@googlemaps/markerclustererplus';
+
+const {addQuery} = require("@/Utils");
 
 export default {
     props: {
@@ -24,6 +39,7 @@ export default {
             markerClusterer:null,
             infoWindow: null,
             style: 3,
+            punto: null,
         }
     },
     watch:{
@@ -38,6 +54,9 @@ export default {
         })
     },
     methods:{
+        infoWindowClick(punto){
+            this.$router.push(addQuery(this.$route,{},punto.getPuntoUrlSlug()))
+        },
         cargarMarkers(){
             this.markerClusterer?.clearMarkers();
             const { Marker } = this.google.maps;
@@ -53,18 +72,8 @@ export default {
                     }
                 )
                 marker.addListener('click', () =>{
-                    console.log(marker.punto)
-                    let urlImage = marker.punto?.image?.url
-                    if(!urlImage){
-                        urlImage =  `http://i.stack.imgur.com/g672i.png`
-                    }
-                    this.infoWindow.setContent(`
-    <div style='float:left'>
-        <img src='${urlImage}' alt="img" style="width: 150px;height: 100%">
-    </div>
-    <div style='float:right; padding: 10px;'>
-        <b>${marker.punto.nombre}</b>
-    </div>`)
+                    this.punto = marker.punto
+                    this.infoWindow.setContent(this.$refs.popup)
                     this.infoWindow.open(this.map,marker)
                 })
                 return marker
@@ -78,9 +87,9 @@ export default {
             );
         }
     },
-    render() {
-        return undefined
-    }
+    // render() {
+    //     return undefined
+    // }
 };
 </script>
 
