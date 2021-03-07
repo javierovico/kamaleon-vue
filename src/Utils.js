@@ -1,3 +1,23 @@
+import Router from "@/router/router";
+
+export function rutearV2({query = {},path, remplazar = false}){
+    console.log('s')
+    const router = Router.currentRoute
+    /** La nueva ruta toma los parametros originales, como si se tratase de una copia para no tener una excepcion */
+    let nuevaRuta = {
+        path: path?path:router.path.toString(),
+        query: JSON.parse(JSON.stringify(router.query))
+    }
+    for(let key in query){
+        nuevaRuta.query[key] = query[key]
+    }
+    if(remplazar){
+        Router.replace(nuevaRuta).catch((e)=>{})
+    }else{
+        Router.push(nuevaRuta).catch((e)=>{})
+    }
+}
+
 export function addQuery(router,query = {},path = null) {
     let nuevaRuta = {
         path: path?path:router.path.toString(),
@@ -32,8 +52,8 @@ export function imprimirError(toastAdmin,error){
     })
 }
 
-export function vaciar(obj){
-    obj.splice(0,obj.length)
+export function vaciar(obj, ...nuevos){
+    obj.splice(0,obj.length,...nuevos)
 }
 
 export const URL_DELIVERY_V2 = 'http://delivery-api.skytellocal.com.py/api/delivery/v2/'
@@ -107,7 +127,6 @@ export function camelCaseToSpace(c) {
 }
 
 
-import Vue from "vue";
 //COMPUTED
 export function llenarQuery(params){
     let salida = {}

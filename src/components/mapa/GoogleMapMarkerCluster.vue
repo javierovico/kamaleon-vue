@@ -55,7 +55,8 @@ export default {
     },
     methods:{
         infoWindowClick(punto){
-            this.$router.push(addQuery(this.$route,{},punto.getPuntoUrlSlug()))
+            window.open(punto.getPuntoUrlSlug(),'_blanck')
+            // this.$router.push(addQuery(this.$route,{},punto.getPuntoUrlSlug()))
         },
         cargarMarkers(){
             this.markerClusterer?.clearMarkers();

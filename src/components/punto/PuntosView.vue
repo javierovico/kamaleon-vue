@@ -1,6 +1,9 @@
 <template>
     <b-container class="mt-5" fluid="md">
         <b-row>
+            <b-col cols="12">
+                <h3>{{title}}</h3>
+            </b-col>
             <b-col v-for="punto in puntos" col xs="12" sm="12" md="6" lg="4" xl="3" :key="punto.id" class="d-flex align-items-stretch">
                 <b-card
                     :title="punto.nombre"
@@ -17,7 +20,7 @@
                     </template>
                 </b-card>
             </b-col>
-            <b-col cols="12" class="mt-4">
+            <b-col cols="12" class="mt-4" v-if="totalRow > propPerPage">
                 <b-pagination
                     pills
                     :value="page"
@@ -43,6 +46,9 @@ const variablesQuery = {
     sortBy: {type:'string',default:''},
     sortDesc: {type:'boolean',default:false},
     perPage: {type:'number',default:12},
+    nombre: {type:'string', default:''},
+    departamentoId: {type:'number', default:null},
+    ciudadId: {type:'number', default:null},
 }
 
 export default {
@@ -63,11 +69,62 @@ export default {
     },
     computed:{
         ...llenarQuery(variablesQuery),
+        sinResultados(){
+            return this.$store.getters.punto_sin_resultados(this.idInstancia)
+        },
+        /** Puede retornar undefined */
+        departamento(){
+            return this.$store.getters.taxo_departamento_get_by_id(this.propDepartamentoId)
+        },
+        ciudad(){
+            return this.$store.getters.taxo_ciudad_get_ciudad_by_id(this.propCiudadId)
+        },
+        title(){
+            let titulo = ``
+            /** Para especificar donde se esta buscando */
+            let seccionLocalidad = ``
+            if(this.ciudad){
+                seccionLocalidad += ` en la ciudad de ${this.ciudad.nombre}`
+            }else if(this.departamento){
+                seccionLocalidad += ` en el departamento de ${this.departamento.getNombreDepartamento()}`
+            }
+            if(this.sinResultados){
+                titulo = `Sin Resultados`
+                if(this.propNombre){
+                    titulo += ` para "${this.propNombre}"`
+                }
+                if(seccionLocalidad){
+                    titulo += seccionLocalidad
+                }
+            }else if(this.propNombre){
+                titulo = `Mostrando resultados para "${this.propNombre}"`
+                if(seccionLocalidad){
+                    titulo += seccionLocalidad
+                }
+            }else{
+                titulo = `Mostrando todos los puntos`
+                if(seccionLocalidad){
+                    titulo += seccionLocalidad
+                }
+            }
+            return titulo
+        },
+        taxos_id(){
+            const taxos_id = []
+            if(this.propCiudadId){
+                taxos_id.push(this.propCiudadId)
+            }else if(this.propDepartamentoId){
+                taxos_id.push(this.propDepartamentoId)
+            }
+            return taxos_id
+        },
         params(){
             return {
                 with:['image','location'],
                 page:this.propPage,
-                perPage: this.propPerPage
+                perPage: this.propPerPage,
+                buscar: this.propNombre,
+                taxos_id: this.taxos_id,
             }
         },
         idInstancia(){

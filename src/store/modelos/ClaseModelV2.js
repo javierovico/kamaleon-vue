@@ -1,33 +1,83 @@
-import Tour from "@/store/modelos/Tour";
-
 export default class ClaseModelV2{
-
-    //para actualizacion masiva
-    _update = false
-    _add = false
 
     objetos
     primaryKey
     urlDescarga
 
-
+    /**
+     * @param params
+     * @param objetos:
+     * [
+     *      {
+     *          key:'encuesta_nueva',
+     *          type: Encuesta,
+     *          porDefecto: new Encuesta(3,3,2),
+     *      },
+     *      {
+     *          key:'preguntas',
+     *          type: Pregunta,
+     *          porDefecto: undefined,
+     *          array: true,
+     *      },
+     *      {
+     *          key:'pivot',
+     *          type: undefined,
+     *          porDefecto: undefined,
+     *          hijos:[
+     *              {
+     *                  key:'encuesta_nueva',
+     *                  type: Encuesta,
+     *                  porDefecto: new Encuesta(3,3,2),
+     *              },
+     *          ]
+     *      },
+     *      {
+     *          key:'pivot',
+     *          type: undefined,
+     *          porDefecto: undefined,
+     *          hijos:['id','texto']
+     *      }
+     * ]
+     * @param primaryKey
+     * @param urlDescarga
+     */
     constructor(params,objetos = [],primaryKey = 'id',urlDescarga = 'xxx') {
         this.objetos = objetos
         this.primaryKey = primaryKey
         this.urlDescarga = urlDescarga
-        this.objetos.forEach(({key,type,porDefecto})=>{
-            if(typeof params[key] !== 'undefined'){
-                switch(type){
-                    case String:
-                    case Number:
-                    case null:
-                        this[key] = params[key]
-                        break;
-                    default:
-                        this[key] = (params[key])?new type(params[key]):null
-                }
+        this.iterarHijos(params,this.objetos)
+    }
+
+    iterarHijos(params,objetos,target = this){
+        objetos = objetos.map(o=>(o?.key)?o:({
+            key:o,
+        }))
+        objetos.forEach(({key,type = null,porDefecto = null, array = false, hijos = false})=>{
+            if(hijos && hijos.length){
+                target[key] = {}
+                this.iterarHijos(params[key]?params[key]:{},hijos,target[key])
             }else{
-                this[key] = porDefecto
+                if(array){
+                    porDefecto = []
+                }
+                if(typeof params[key] !== 'undefined'){
+                    switch(type){
+                        case String:
+                        case Number:
+                        case null:
+                        case undefined:
+                            target[key] = params[key]
+                            break;
+                        default:
+                            if(array){
+                                target[key] = (params[key] && params[key].length)?(params[key].map(p=>new type(p))):[]
+                            }else{
+                                target[key] = (params[key])?new type(params[key]):null
+                            }
+                    }
+                }else{
+                    target[key] = porDefecto
+                }
             }
         })
     }

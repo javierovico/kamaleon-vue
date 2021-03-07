@@ -7,6 +7,7 @@ import visor from "@/store/modules/visor";
 import tourSpot from "@/store/modules/tourSpot";
 import pano from "@/store/modules/pano";
 import tour from "@/store/modules/tour";
+import taxo from "@/store/modules/taxo";
 Vue.use(Vuex);
 const debug = process.env.NODE_ENV !== "production";
 
@@ -18,7 +19,8 @@ export default new Vuex.Store({
         visor,
         tourSpot,
         pano,
-        tour
+        tour,
+        taxo
     },
     strict: debug
 });

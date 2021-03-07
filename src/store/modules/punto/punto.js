@@ -27,6 +27,7 @@ const getters = {
     punto_cargando: (state,getters) => idInstancia => getters.punto_instancia(idInstancia)?.status === 'cargando',
     punto_puntos: (state,getters) => idInstancia => getters.punto_cargado(idInstancia)?getters.punto_instancia(idInstancia)?.puntos:[],
     punto_total: (state,getters) => idInstancia => getters.punto_cargado(idInstancia)?getters.punto_instancia(idInstancia)?.total:1000,
+    punto_sin_resultados: (state,getters) => idInstancia => getters.punto_cargado(idInstancia)?getters.punto_instancia(idInstancia)?.total === 0:false,
     punto_last_page: (state,getters) => idInstancia => getters.punto_instancia(idInstancia)?.last_page,
     punto_recargar: (state,getters) => idInstancia => getters.punto_instancia(idInstancia)?.status === 'recargar',
     punto_instanciado: (state,getters) => idInstancia => !!getters.punto_instancia(idInstancia),
