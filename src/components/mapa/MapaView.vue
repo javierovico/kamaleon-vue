@@ -39,6 +39,8 @@ const variablesQuery = {
     sortBy: {type:'string',default:''},
     sortDesc: {type:'boolean',default:false},
     perPage: {type:'number',default:12},
+    departamentoId: {type:'number', default:null},
+    ciudadId: {type:'number', default:null},
 }
 export default {
     name: "MapaView",
@@ -60,6 +62,22 @@ export default {
     },
     computed:{
         ...llenarQuery(variablesQuery),
+        params(){
+            return {
+                with:['image','location'],
+                buscar: this.propBusqueda,
+                taxos_id: this.taxos_id,
+            }
+        },
+        taxos_id(){
+            const taxos_id = []
+            if(this.propCiudadId){
+                taxos_id.push(this.propCiudadId)
+            }else if(this.propDepartamentoId){
+                taxos_id.push(this.propDepartamentoId)
+            }
+            return taxos_id
+        },
         mapConfig() {
             return {
                 ...mapSettings,
@@ -80,7 +98,8 @@ export default {
             }))
         },
         idInstancia(){
-            return this.$store.getters.punto_get_instancia_from_location_only
+            // return this.$store.getters.punto_get_instancia_from_location_only
+            return this.$store.getters.punto_get_instancia_from_params(this.params)
         },
         puntos(){
             return this.$store.getters.punto_puntos(this.idInstancia)
@@ -96,7 +115,10 @@ export default {
     methods:{
         ...cambiarQuery(variablesQuery),
         cargarPuntosInterno(){
-            this.$store.dispatch('punto_cargar_all_with_location')
+            // this.$store.dispatch('punto_cargar_all_with_location')
+            this.$store.dispatch('punto_cargar_from_params',{
+                params:this.params
+            })
         },
         paginationClick(page){
             if(page !== this.page){

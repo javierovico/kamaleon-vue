@@ -40,6 +40,7 @@ export default {
             infoWindow: null,
             style: 3,
             punto: null,
+            bounds: null,
         }
     },
     watch:{
@@ -60,7 +61,8 @@ export default {
         },
         cargarMarkers(){
             this.markerClusterer?.clearMarkers();
-            const { Marker } = this.google.maps;
+            const { Marker, LatLngBounds } = this.google.maps;
+            this.bounds = new LatLngBounds()
             this.markersGoogle = this.markers.map(m=> {
                 const marker = new Marker(
                     {
@@ -72,6 +74,7 @@ export default {
                         punto:m.punto,
                     }
                 )
+                this.bounds.extend(m.position)
                 marker.addListener('click', () =>{
                     this.punto = marker.punto
                     this.infoWindow.setContent(this.$refs.popup)
@@ -86,6 +89,7 @@ export default {
                     clusterClass: this.style === 3 ? "custom-clustericon" : undefined,
                 }
             );
+            this.map.fitBounds(this.bounds)
         }
     },
     // render() {

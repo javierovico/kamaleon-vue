@@ -46,9 +46,9 @@ const variablesQuery = {
     sortBy: {type:'string',default:''},
     sortDesc: {type:'boolean',default:false},
     perPage: {type:'number',default:12},
-    nombre: {type:'string', default:''},
-    departamentoId: {type:'number', default:null},
-    ciudadId: {type:'number', default:null},
+    busqueda: {type:'string', default:'',prefijoQuery:null, soloLectura: true},
+    departamentoId: {type:'number', default:null,prefijoQuery:null, soloLectura: true},
+    ciudadId: {type:'number', default:null,prefijoQuery:null, soloLectura: true},
 }
 
 export default {
@@ -90,14 +90,14 @@ export default {
             }
             if(this.sinResultados){
                 titulo = `Sin Resultados`
-                if(this.propNombre){
-                    titulo += ` para "${this.propNombre}"`
+                if(this.propBusqueda){
+                    titulo += ` para "${this.propBusqueda}"`
                 }
                 if(seccionLocalidad){
                     titulo += seccionLocalidad
                 }
-            }else if(this.propNombre){
-                titulo = `Mostrando resultados para "${this.propNombre}"`
+            }else if(this.propBusqueda){
+                titulo = `Mostrando resultados para "${this.propBusqueda}"`
                 if(seccionLocalidad){
                     titulo += seccionLocalidad
                 }
@@ -123,7 +123,7 @@ export default {
                 with:['image','location'],
                 page:this.propPage,
                 perPage: this.propPerPage,
-                buscar: this.propNombre,
+                buscar: this.propBusqueda,
                 taxos_id: this.taxos_id,
             }
         },

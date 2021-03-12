@@ -134,7 +134,12 @@ export function llenarQuery(params){
         switch(value.type){
             default:
                 Object.assign(salida,{['prop'+key.charAt(0).toUpperCase() + key.slice(1)]: function(){
-                    const prefijo = this.propPrefijoQuery?(this.propPrefijoQuery+ '_'):''
+                    let prefijo = this.propPrefijoQuery?(this.propPrefijoQuery+ '_'):''
+                    if(value.prefijoQuery){
+                        prefijo = value.prefijoQuery + '_'
+                    }else if(value.prefijoQuery === null){
+                        prefijo = ''
+                    }
                     if(!key){
                         key = camelToSnake(key)
                     }
@@ -164,18 +169,20 @@ export function llenarQuery(params){
 export function cambiarQuery(params){
     let salida = {['loadQuery'] : function(){
         for(let [key,value] of Object.entries(params)){
-            switch(value.type){
-                case 'modal':
-                    if(this['prop'+key.charAt(0).toUpperCase() + key.slice(1)]){
-                        this.$bvModal.show(value.id)
-                    }
-                    break;
-                default:
-                    this[key] = this['prop'+key.charAt(0).toUpperCase() + key.slice(1)]
-                    if(value.form){
-                        this['form'+key.charAt(0).toUpperCase() + key.slice(1)] = this['prop'+key.charAt(0).toUpperCase() + key.slice(1)]
-                    }
-                    break;
+            if(!value.soloLectura) {
+                switch (value.type) {
+                    case 'modal':
+                        if (this['prop' + key.charAt(0).toUpperCase() + key.slice(1)]) {
+                            this.$bvModal.show(value.id)
+                        }
+                        break;
+                    default:
+                        this[key] = this['prop' + key.charAt(0).toUpperCase() + key.slice(1)]
+                        if (value.form) {
+                            this['form' + key.charAt(0).toUpperCase() + key.slice(1)] = this['prop' + key.charAt(0).toUpperCase() + key.slice(1)]
+                        }
+                        break;
+                }
             }
         }
     }}
@@ -186,7 +193,12 @@ export function cambiarQuery(params){
         switch(value.type){
             case 'modal':
                 Object.assign(salida,{['cerrar'+key.charAt(0).toUpperCase() + key.slice(1)]: function(){
-                    const prefijo = this.propPrefijoQuery?(this.propPrefijoQuery+ '_'):''
+                    let prefijo = this.propPrefijoQuery?(this.propPrefijoQuery+ '_'):''
+                    if(value.prefijoQuery){
+                        prefijo = value.prefijoQuery + '_'
+                    }else if(value.prefijoQuery === null){
+                        prefijo = ''
+                    }
                     const queryInsert = prefijo + key
                     this.$router.push(addQuery(this.$route,{rem:[queryInsert]})).catch(()=>{})
                 }})
@@ -197,18 +209,20 @@ export function cambiarQuery(params){
                     }})
                 break;
             default:
-                Object.assign(salida,{['set'+key.charAt(0).toUpperCase() + key.slice(1)]: function(nuevo){
-                    const prefijo = this.propPrefijoQuery?(this.propPrefijoQuery+ '_'):''
-                    if(!key){
-                        key = camelToSnake(key)
-                    }
-                    const queryInsert = prefijo + key
-                    if(nuevo !== null){
-                        this.$router.replace(addQuery(this.$route,{add:{[queryInsert]:nuevo}})).catch((e)=>{})
-                    }else{
-                        this.$router.replace(addQuery(this.$route,{rem:[queryInsert]})).catch(()=>{})
-                    }
-                }})
+                if(!value.soloLectura){
+                    Object.assign(salida,{['set'+key.charAt(0).toUpperCase() + key.slice(1)]: function(nuevo){
+                            const prefijo = this.propPrefijoQuery?(this.propPrefijoQuery+ '_'):''
+                            if(!key){
+                                key = camelToSnake(key)
+                            }
+                            const queryInsert = prefijo + key
+                            if(nuevo !== null){
+                                this.$router.replace(addQuery(this.$route,{add:{[queryInsert]:nuevo}})).catch((e)=>{})
+                            }else{
+                                this.$router.replace(addQuery(this.$route,{rem:[queryInsert]})).catch(()=>{})
+                            }
+                        }})
+                }
         }
     }
     return salida
@@ -228,9 +242,11 @@ export function crearWatch(params){
                 }})
                 break;
             default:
-                Object.assign(salida,{[key]: function(p){
-                    this['set'+key.charAt(0).toUpperCase() + key.slice(1)](p)
-                }})
+                if(!value.soloLectura){
+                    Object.assign(salida,{[key]: function(p){
+                        this['set'+key.charAt(0).toUpperCase() + key.slice(1)](p)
+                    }})
+                }
         }
     }
     return salida
@@ -240,9 +256,11 @@ export function crearWatch(params){
 export function crearVariables(params){
     let salida = {}
     for(let [key,value] of Object.entries(params)){
-        Object.assign(salida,{[key]: value.default})
-        if(value.form){
-            Object.assign(salida,{['form'+key.charAt(0).toUpperCase() + key.slice(1)]: value.default})
+        if(!value.soloLectura){
+            Object.assign(salida,{[key]: value.default})
+            if(value.form){
+                Object.assign(salida,{['form'+key.charAt(0).toUpperCase() + key.slice(1)]: value.default})
+            }
         }
     }
     return salida

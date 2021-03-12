@@ -86,7 +86,6 @@ export default {
     name: "NavBar",
     data: ()=>({
         ...crearVariables(variablesQuery),
-        propPrefijoQuery: 'punto',
     }),
     watch: {
         ...crearWatch(variablesQuery),
