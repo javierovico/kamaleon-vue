@@ -25,6 +25,7 @@ export default class Punto extends ClaseModelV2{
 
     static URL_DESCARGA = `hotel`
     static URL_DESCARGA_SLUG = `punto-slug`
+    static URL_GET_VERSION = '/hotel/version';
 
     constructor(e) {
         super(e,Punto.OBJETOS,'id',Punto.URL_DESCARGA);

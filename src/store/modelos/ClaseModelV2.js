@@ -48,6 +48,43 @@ export default class ClaseModelV2{
         this.iterarHijos(params,this.objetos)
     }
 
+    /**
+     * Basicamente exporta los datos necesarios nada mas de este objeto para ser serializado
+     */
+    export(){
+        return this.iterarExport(this.objetos)
+    }
+
+    iterarExport(objetos,target = this){
+        let result = {}
+        objetos = objetos.map(o=>(o?.key)?o:({
+            key:o,
+        }))
+        objetos.forEach(({key,type = null, array = false, hijos = false})=>{
+            if(hijos && hijos.length){
+                result [key] = this.iterarExport(hijos,target[key])
+            }else{
+                if(target[key]){
+                    switch(type){
+                        case String:
+                        case Number:
+                        case null:
+                        case undefined:
+                            result[key] = target[key]
+                            break;
+                        default:
+                            if(array){
+                                result[key] = target[key].map(t=>t.export())
+                            }else{
+                                result[key] = target[key].export()
+                            }
+                    }
+                }
+            }
+        })
+        return result
+    }
+
     iterarHijos(params,objetos,target = this){
         objetos = objetos.map(o=>(o?.key)?o:({
             key:o,

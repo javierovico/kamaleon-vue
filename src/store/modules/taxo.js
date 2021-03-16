@@ -8,10 +8,14 @@ import TaxoTipo from "@/store/modelos/TaxoTipo";
 
 const state = {
     instancia_departamento: {
-        departamentos:[],
-        status: '',
+        departamentos:localStorage.getItem("taxo-departamento")?JSON.parse(localStorage.getItem("taxo-departamento")).map(t=>Taxo.fromSource(t)):[],
+        status: localStorage.getItem("taxo-departamento")?'cargado':'',
     },
-    instancia_ciudad: []
+    instancia_ciudad: (JSON.parse(localStorage.getItem('taxo-departamento-ciudad') || "[]")).map(({departamentoId,ciudades})=>({
+        departamentoId,
+        ciudades: ciudades.map(c=>Taxo.fromSource(c)),
+        status: 'cargado'
+    }))
 };
 
 const getters = {
@@ -99,6 +103,7 @@ const mutations = {
         vaciar(state.instancia_departamento.departamentos)
         state.instancia_departamento.departamentos.push(...departamentos)
         state.instancia_departamento.departamentos.status = 'cargado'
+        localStorage.setItem('taxo-departamento',JSON.stringify(departamentos.map(d=>d.export())))
     },
     taxo_departamento_error: (state,{error})=>{
         vaciar(state.instancia_departamento.departamentos)
@@ -116,6 +121,12 @@ const mutations = {
         }
         vaciar(instancia.ciudades,...ciudades)
         instancia.status = 'cargado'
+        localStorage.setItem('taxo-departamento-ciudad',JSON.stringify(state.instancia_ciudad.map(
+            ({departamentoId,ciudades})=>({
+                departamentoId,
+                ciudades:ciudades.map(c=>c.export())
+            })))
+        )
     },
     taxo_ciudad_error: (state,{error,departamentoId})=>{
         let instancia = state.instancia_ciudad.find(o=> o.departamentoId === departamentoId)

@@ -16,10 +16,16 @@ const TIPO_SLUG = 2
 const TIPO_LOCATION_ONLY = 3
 
 const state = {
-    instancias: []
+    instancias: [],
+    general:{
+        version: localStorage.getItem("punto-version")? parseInt(localStorage.getItem("punto-version")):null,
+        puntos: JSON.parse(localStorage.getItem("punto-punto") || '[]').map(p=>Punto.fromSource(p)),
+    }
 };
 
 const getters = {
+    punto_general_version: state => state.general.version,
+    punto_general: state => state.general.puntos,
     punto_instancia: state => idInstancia => state.instancias.find(o=>o.idInstancia === idInstancia),
     punto_status: (state,getters) => idInstancia => getters.punto_instancia(idInstancia)?.status,
     punto_cargado: (state,getters) => idInstancia => getters.punto_status(idInstancia) === 'cargado',
@@ -60,10 +66,10 @@ const actions = {
             return dispatch('punto_cargar',{params,url,idInstancia,tipoInstancia})
         }
     },
-    punto_cargar_all_with_location({dispatch}){
+    punto_cargar_all({dispatch}){
         const params = {
             with:['image','location'],
-            whereHas: ['location'],
+            // whereHas: ['location'],
             // columns: ['id','nombre','slug','image_id','location_id'],
             descargar:true,
         }
@@ -93,7 +99,7 @@ const actions = {
                     const puntos = response.data.data.map(p=> Punto.fromSource(p))
                     const {total,last_page} = response.data
                     dispatch('punto_guardar_puntos',{idInstancia,puntos,total,last_page,tipoInstancia})
-                    resolve()
+                    resolve({puntos})
                 }).catch(error => {
                     dispatch('general_error', error)
                     commit('punto_error', {error,idInstancia});
@@ -105,6 +111,18 @@ const actions = {
     punto_guardar_puntos({commit,dispatch,getters},{idInstancia,puntos,total,last_page}){
         commit('punto_cargando',{idInstancia})
         commit('punto_cargado', {puntos,idInstancia,total,last_page});
+    },
+    punto_general_cargar_todo({commit,getters,dispatch}){
+        const url = Punto.URL_GET_VERSION
+        axios({
+            url
+        }).then(response=>{
+            if(!getters.punto_general_version || (response.data.version > getters.punto_general_version)){
+                dispatch('punto_cargar_all').then(({puntos})=>{
+                    commit('punto_general_set_puntos',{version:response.data.version,puntos})
+                })
+            }
+        })
     },
 };
 
@@ -145,6 +163,12 @@ const mutations = {
         instancia.status = 'error'
         instancia.errorString = (error.response && error.response.data.message) ? error.response.data.message : error
     },
+    punto_general_set_puntos: (state, {puntos, version}) => {
+        state.general.version = version
+        state.general.puntos = puntos
+        localStorage.setItem('punto-version',parseInt(version))
+        localStorage.setItem('punto-punto',JSON.stringify(puntos.map(p=>p.export())))
+    }
 };
 
 export default {

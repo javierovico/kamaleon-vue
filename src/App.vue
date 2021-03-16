@@ -12,7 +12,9 @@
         name: 'App',
         components: {
             NavBar
-
+        },
+        mounted() {
+            this.$store.dispatch('punto_general_cargar_todo')
         }
     }
 </script>

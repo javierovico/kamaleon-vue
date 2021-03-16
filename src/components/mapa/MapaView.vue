@@ -97,16 +97,9 @@ export default {
                 punto:p
             }))
         },
-        idInstancia(){
-            // return this.$store.getters.punto_get_instancia_from_location_only
-            return this.$store.getters.punto_get_instancia_from_params(this.params)
-        },
         puntos(){
-            return this.$store.getters.punto_puntos(this.idInstancia)
+            return this.$store.getters.punto_puntos
         },
-        totalRow(){
-            return this.$store.getters.punto_total(this.idInstancia)
-        }
     },
     mounted(){
         this.loadQuery()
@@ -116,9 +109,9 @@ export default {
         ...cambiarQuery(variablesQuery),
         cargarPuntosInterno(){
             // this.$store.dispatch('punto_cargar_all_with_location')
-            this.$store.dispatch('punto_cargar_from_params',{
-                params:this.params
-            })
+            // this.$store.dispatch('punto_cargar_from_params',{
+            //     params:this.params
+            // })
         },
         paginationClick(page){
             if(page !== this.page){
