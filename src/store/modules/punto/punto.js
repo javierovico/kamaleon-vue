@@ -3,7 +3,7 @@ import Punto from "@/store/modelos/Punto";
 import {vaciar} from "@/Utils";
 
 
-function instanciaFromParams(params) {
+export function instanciaFromParams(params) {
     return 'pano_from_params:'+JSON.stringify(params)
 }
 
@@ -25,6 +25,7 @@ const state = {
 
 const getters = {
     punto_general_version: state => state.general.version,
+    punto_general_all_puntos: state => state.general.puntos,
     punto_general: state => state.general.puntos,
     punto_instancia: state => idInstancia => state.instancias.find(o=>o.idInstancia === idInstancia),
     punto_status: (state,getters) => idInstancia => getters.punto_instancia(idInstancia)?.status,
@@ -38,7 +39,6 @@ const getters = {
     punto_recargar: (state,getters) => idInstancia => getters.punto_instancia(idInstancia)?.status === 'recargar',
     punto_instanciado: (state,getters) => idInstancia => !!getters.punto_instancia(idInstancia),
     punto_get_instancia_from_params: () => params => instanciaFromParams(params),
-    punto_get_instancia_from_location_only: () => instanciaFromLocationOnly(),
     /** Busca si existe un punto ya cargado a partir de su slug */
     punto_get_punto_by_slug: (state,getters) => slug => {
         let punto = null

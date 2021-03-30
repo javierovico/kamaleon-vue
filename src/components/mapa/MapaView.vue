@@ -31,16 +31,15 @@ const {crearWatch} = require("@/Utils");
 const {crearVariables} = require("@/Utils");
 import GoogleMapMarkerCluster from "@/components/mapa/GoogleMapMarkerCluster";
 
+const {instanciaFromParams} = require("@/store/modules/punto/punto");
+
 const {mapSettings} = require("@/constants/mapSettings");
 
 
 const variablesQuery = {
-    page: {type:'number',default:1},
-    sortBy: {type:'string',default:''},
-    sortDesc: {type:'boolean',default:false},
-    perPage: {type:'number',default:12},
     departamentoId: {type:'number', default:null},
     ciudadId: {type:'number', default:null},
+    busqueda: {type:'string', default:null},
 }
 export default {
     name: "MapaView",
@@ -67,6 +66,7 @@ export default {
                 with:['image','location'],
                 buscar: this.propBusqueda,
                 taxos_id: this.taxos_id,
+                descargar:true,
             }
         },
         taxos_id(){
@@ -92,14 +92,21 @@ export default {
             };
         },
         puntosPosicion(){
-            return this.puntos.map(p=>({
+            return this.puntos.filter(p=>p.getLatLngObject()).map(p=>({
                 position:p.getLatLngObject(),
                 punto:p
             }))
         },
-        puntos(){
-            return this.$store.getters.punto_puntos
+        idInstancia(){
+            // return this.$store.getters.punto_get_instancia_from_location_only
+            return instanciaFromParams(this.params)
         },
+        puntos(){
+            return this.$store.getters.punto_puntos(this.idInstancia)
+        },
+        totalRow(){
+            return this.$store.getters.punto_total(this.idInstancia)
+        }
     },
     mounted(){
         this.loadQuery()
@@ -109,14 +116,9 @@ export default {
         ...cambiarQuery(variablesQuery),
         cargarPuntosInterno(){
             // this.$store.dispatch('punto_cargar_all_with_location')
-            // this.$store.dispatch('punto_cargar_from_params',{
-            //     params:this.params
-            // })
-        },
-        paginationClick(page){
-            if(page !== this.page){
-                this.page = page
-            }
+            this.$store.dispatch('punto_cargar_from_params',{
+                params:this.params
+            })
         },
     }
 }
